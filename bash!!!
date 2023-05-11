@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This script is a lightweight port scanner tool similar to the py script but more local based
+
+# Get the hostname or IP address of the target host.
+host=$1
+
+# Get the range of ports to scan.
+ports=$2
+
+# If no ports are specified, scan all ports from 1 to 65535.
+if [ -z "$ports" ]; then
+  ports="1-65535"
+fi
+
+# Create a list of ports to scan.
+port_list=()
+for port in $ports; do
+  port_list+=("$port")
+done
+
+# Start the port scan.
+for port in "${port_list[@]}"; do
+  # Check if the port is open.
+  nc -z -v -n "$host" "$port" >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    echo "Port $port is open."
+  else
+    echo "Port $port is closed."
+  fi
+done
+
+# Save the results to a file.
+echo "Port | Status" > results.txt
+for port in "${port_list[@]}"; do
+  # Check if the port is open.
+  nc -z -v -n "$host" "$port" >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    echo "$port | Open" >> results.txt
+  else
+    echo "$port | Closed" >> results.txt
+  fi
+done
